@@ -96,26 +96,28 @@ type Response struct {
 	Copyright           Copyright   `json:"copyright"`
 }
 
-func Get(city string) ([]byte, error) {
+func Get(city string) (Response, error) {
 	const baseUrl = "https://weather.tsukumijima.net/api/forecast/city/"
 	url := baseUrl + city
 	req, _ := http.NewRequest(http.MethodGet, url, nil)
 	client := new(http.Client)
 	resp, err := client.Do(req)
+	var response Response
 	if err != nil {
 		fmt.Println("Error Request:", err)
-		return nil, err
+		return response, err
 	}
 
 	body, readErr := io.ReadAll(resp.Body)
 	if readErr != nil {
 		fmt.Println("ioutil.ReadAll err:", readErr)
-		return nil, readErr
+		return response, readErr
 	}
 
-	var response Response
-	if err = json.Unmarshal(body, &response); err != nil {
-		fmt.Println("json.Unmarshal err:", err.Error())
+	jsonErr := json.Unmarshal(body, &response)
+	if jsonErr != nil {
+		fmt.Println("json.Unmarshal err:", jsonErr)
+		return response, jsonErr
 	}
-	return body, nil
+	return response, nil
 }
