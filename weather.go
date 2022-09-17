@@ -96,7 +96,7 @@ type Response struct {
 	Copyright           Copyright   `json:"copyright"`
 }
 
-func get(city string) ([]byte, error) {
+func Get(city string) ([]byte, error) {
 	const baseUrl = "https://weather.tsukumijima.net/api/forecast/city/"
 	url := baseUrl + city
 	req, _ := http.NewRequest(http.MethodGet, url, nil)
