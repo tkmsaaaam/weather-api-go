@@ -96,11 +96,18 @@ type Response struct {
 	Copyright           Copyright   `json:"copyright"`
 }
 
-func Get(city string) (Response, error) {
+type Client struct {
+	*http.Client
+}
+
+func New() Client {
+	return Client{http.DefaultClient}
+}
+
+func (client Client) Get(city string) (Response, error) {
 	const baseUrl = "https://weather.tsukumijima.net/api/forecast/city/"
 	url := baseUrl + city
 	req, _ := http.NewRequest(http.MethodGet, url, nil)
-	client := new(http.Client)
 	resp, err := client.Do(req)
 	var response Response
 	if err != nil {
