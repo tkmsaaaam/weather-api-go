@@ -1,6 +1,10 @@
 package weather
 
 import (
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
 	"time"
 )
 
@@ -90,4 +94,28 @@ type Response struct {
 	Forecasts           []Forecast  `json:"forecasts"`
 	Location            Location    `json:"location"`
 	Copyright           Copyright   `json:"copyright"`
+}
+
+func get(city string) ([]byte, error) {
+	const baseUrl = "https://weather.tsukumijima.net/api/forecast/city/"
+	url := baseUrl + city
+	req, _ := http.NewRequest(http.MethodGet, url, nil)
+	client := new(http.Client)
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println("Error Request:", err)
+		return nil, err
+	}
+
+	body, readErr := io.ReadAll(resp.Body)
+	if readErr != nil {
+		fmt.Println("ioutil.ReadAll err:", readErr)
+		return nil, readErr
+	}
+
+	var response Response
+	if err = json.Unmarshal(body, &response); err != nil {
+		fmt.Println("json.Unmarshal err:", err.Error())
+	}
+	return body, nil
 }
