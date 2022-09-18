@@ -9,6 +9,13 @@ import (
 	"testing"
 )
 
+func TestNew(t *testing.T) {
+	t.Run("New", func(t *testing.T) {
+		client := weather.New()
+		assert.Equal(t, weather.Client{Client: http.DefaultClient}, client)
+	})
+}
+
 func TestGetOk(t *testing.T) {
 	recorderClient, _ := recorder.New("./fixtures/ok")
 	defer func(recorderClient *recorder.Recorder) {
@@ -21,8 +28,9 @@ func TestGetOk(t *testing.T) {
 		Transport: recorderClient,
 	}}
 	t.Run("Get", func(t *testing.T) {
-		response, _ := weatherClient.Get("130010")
+		response, err := weatherClient.Get("130010")
 		assert.Equal(t, "東京都 東京 の天気", response.Title)
+		assert.Equal(t, nil, err)
 	})
 }
 
@@ -38,7 +46,8 @@ func TestGetErr(t *testing.T) {
 		Transport: recorderClient,
 	}}
 	t.Run("Get", func(t *testing.T) {
-		response, _ := weatherClient.Get("400000")
+		response, err := weatherClient.Get("400000")
 		assert.Equal(t, "", response.Title)
+		assert.Equal(t, nil, err)
 	})
 }
