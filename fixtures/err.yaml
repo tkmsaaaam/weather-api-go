@@ -1,30 +1,29 @@
----
 version: 1
 interactions:
-- request:
-    body: ""
-    form: {}
-    headers: {}
-    url: https://weather.tsukumijima.net/api/forecast/city/400000
-    method: GET
-  response:
-    body: |-
-      {
-          "error": "The specified city ID is invalid."
-      }
-    headers:
-      Access-Control-Allow-Origin:
-      - '*'
-      Cache-Control:
-      - no-cache, private
-      Content-Length:
-      - "52"
-      Content-Type:
-      - application/json
-      Date:
-      - Sat, 17 Sep 2022 12:48:51 GMT
-      Server:
-      - Apache
-    status: 200 OK
-    code: 200
-    duration: ""
+  - request:
+      body: ""
+      form: {}
+      headers: {}
+      url: https://weather.tsukumijima.net/api/forecast/city/400000
+      method: GET
+    response:
+      body: |-
+        {
+            "error": "The specified city ID is invalid."
+        }
+      headers:
+        Access-Control-Allow-Origin:
+          - '*'
+        Cache-Control:
+          - no-cache, private
+        Content-Length:
+          - "52"
+        Content-Type:
+          - application/json
+        Date:
+          - Sat, 17 Sep 2022 12:48:51 GMT
+        Server:
+          - Apache
+      status: 200 OK
+      code: 200
+      duration: ""
