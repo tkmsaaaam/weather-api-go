@@ -1,6 +1,6 @@
 module github.com/tkmsaaaam/weather-api-go
 
-go 1.19
+go 1.20
 
 require (
 	github.com/dnaeon/go-vcr v1.2.0
