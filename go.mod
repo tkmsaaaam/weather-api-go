@@ -1,10 +1,10 @@
 module github.com/tkmsaaaam/weather-api-go
 
-go 1.21
+go 1.22
 
 require (
 	github.com/dnaeon/go-vcr v1.2.0
-	github.com/stretchr/testify v1.8.4
+	github.com/stretchr/testify v1.9.0
 )
 
 require (
