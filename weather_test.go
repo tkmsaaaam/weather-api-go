@@ -46,8 +46,7 @@ func TestGetErr(t *testing.T) {
 		Transport: recorderClient,
 	}}
 	t.Run("Get", func(t *testing.T) {
-		response, err := weatherClient.Get("400000")
-		assert.Equal(t, "", response.Title)
-		assert.Equal(t, nil, err)
+		_, err := weatherClient.Get("400000")
+		assert.Equal(t, "weather-api-go: can not get normal result. The specified city ID is invalid.", err.Error())
 	})
 }

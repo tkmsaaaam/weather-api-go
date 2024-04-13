@@ -84,7 +84,7 @@ type Copyright struct {
 	Provider []Provider     `json:"provider"`
 }
 
-type Response struct {
+type NormalResponse struct {
 	PublicTime          time.Time   `json:"publicTime"`
 	PublicTimeFormatted string      `json:"publicTimeFormatted"`
 	PublishingOffice    string      `json:"publishingOffice"`
@@ -96,6 +96,10 @@ type Response struct {
 	Copyright           Copyright   `json:"copyright"`
 }
 
+type ErrorResponse struct {
+	Error string `json:"error"`
+}
+
 type Client struct {
 	*http.Client
 }
@@ -104,7 +108,7 @@ func New() Client {
 	return Client{http.DefaultClient}
 }
 
-func (client Client) Get(city string) (*Response, error) {
+func (client Client) Get(city string) (*NormalResponse, error) {
 	const baseUrl = "https://weather.tsukumijima.net/api/forecast/city/"
 	url := baseUrl + city
 	req, requestErr := http.NewRequest(http.MethodGet, url, nil)
@@ -112,19 +116,25 @@ func (client Client) Get(city string) (*Response, error) {
 		return nil, fmt.Errorf("weather-api-go: can not make request. %v", requestErr)
 	}
 	resp, err := client.Do(req)
-	var response Response
 	if err != nil {
-		return &response, fmt.Errorf("weather-api-go: request is failed. %v", err)
+		return nil, fmt.Errorf("weather-api-go: request is failed. %v", err)
 	}
 
 	body, readErr := io.ReadAll(resp.Body)
 	if readErr != nil {
-		return &response, fmt.Errorf("weather-api-go: can not read boady. %v", readErr)
+		return nil, fmt.Errorf("weather-api-go: can not read boady. %v", readErr)
 	}
 
-	jsonErr := json.Unmarshal(body, &response)
-	if jsonErr != nil {
-		return &response, fmt.Errorf("weather-api-go: can not parse result. %v", jsonErr)
+	var errorResponse ErrorResponse
+	json.Unmarshal(body, &errorResponse)
+	if errorResponse.Error != "" {
+		return nil, fmt.Errorf("weather-api-go: can not get normal result. %s", errorResponse.Error)
+	}
+
+	var response NormalResponse
+	normalResParseErr := json.Unmarshal(body, &response)
+	if normalResParseErr != nil {
+		return nil, fmt.Errorf("weather-api-go: can not parse result. %v", normalResParseErr)
 	}
 	return &response, nil
 }
