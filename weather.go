@@ -104,27 +104,27 @@ func New() Client {
 	return Client{http.DefaultClient}
 }
 
-func (client Client) Get(city string) (Response, error) {
+func (client Client) Get(city string) (*Response, error) {
 	const baseUrl = "https://weather.tsukumijima.net/api/forecast/city/"
 	url := baseUrl + city
-	req, _ := http.NewRequest(http.MethodGet, url, nil)
+	req, requestErr := http.NewRequest(http.MethodGet, url, nil)
+	if requestErr != nil {
+		return nil, fmt.Errorf("weather-api-go: can not make request. %v", requestErr)
+	}
 	resp, err := client.Do(req)
 	var response Response
 	if err != nil {
-		fmt.Println("Error Request:", err)
-		return response, err
+		return &response, fmt.Errorf("weather-api-go: request is failed. %v", err)
 	}
 
 	body, readErr := io.ReadAll(resp.Body)
 	if readErr != nil {
-		fmt.Println("ioutil.ReadAll err:", readErr)
-		return response, readErr
+		return &response, fmt.Errorf("weather-api-go: can not read boady. %v", readErr)
 	}
 
 	jsonErr := json.Unmarshal(body, &response)
 	if jsonErr != nil {
-		fmt.Println("json.Unmarshal err:", jsonErr)
-		return response, jsonErr
+		return &response, fmt.Errorf("weather-api-go: can not parse result. %v", jsonErr)
 	}
-	return response, nil
+	return &response, nil
 }
