@@ -109,6 +109,9 @@ func New() Client {
 }
 
 func (client Client) Get(city string) (*NormalResponse, error) {
+	if len(city) != 6 {
+		return nil, fmt.Errorf("weather-api-go: CITY ID is invalid.");
+	}
 	const baseUrl = "https://weather.tsukumijima.net/api/forecast/city/"
 	url := baseUrl + city
 	req, requestErr := http.NewRequest(http.MethodGet, url, nil)
