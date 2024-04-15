@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"regexp"
 	"time"
 )
 
@@ -109,14 +110,15 @@ func New() Client {
 }
 
 func (client Client) Get(city string) (*NormalResponse, error) {
-	if len(city) != 6 {
-		return nil, fmt.Errorf("weather-api-go: CITY ID is invalid.");
+	re, _ := regexp.Compile(`[0-9]{6}`)
+	if !re.Match([]byte(city)) {
+		return nil, fmt.Errorf("weather-api-go: %s", "CITY ID is invalid.");
 	}
 	const baseUrl = "https://weather.tsukumijima.net/api/forecast/city/"
 	url := baseUrl + city
 	req, requestErr := http.NewRequest(http.MethodGet, url, nil)
 	if requestErr != nil {
-		return nil, fmt.Errorf("weather-api-go: can not make request. %v", requestErr)
+		return nil, fmt.Errorf("weather-api-go: can not make request. %w", requestErr)
 	}
 	resp, err := client.Do(req)
 	if err != nil {
