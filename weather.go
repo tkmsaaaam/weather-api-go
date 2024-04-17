@@ -112,7 +112,7 @@ func New() Client {
 func (client Client) Get(city string) (*NormalResponse, error) {
 	re, _ := regexp.Compile(`[0-9]{6}`)
 	if !re.Match([]byte(city)) {
-		return nil, fmt.Errorf("weather-api-go: %s", "CITY ID is invalid.");
+		return nil, fmt.Errorf("weather-api-go: %s", "CITY ID is invalid.")
 	}
 	const baseUrl = "https://weather.tsukumijima.net/api/forecast/city/"
 	url := baseUrl + city
