@@ -75,17 +75,26 @@ func TestGetErr(t *testing.T) {
 	tests := []struct {
 		name string
 		id   string
+		ok   bool
 		want want
 	}{
 		{
 			name: "id is invalid",
 			id:   "1",
+			ok:   true,
 			want: want{response: nil, err: "weather-api-go: CITY ID is invalid."},
 		},
 		{
 			name: "not found",
 			id:   "400000",
+			ok:   true,
 			want: want{response: nil, err: "weather-api-go: can not get normal result. The specified city ID is invalid."},
+		},
+		{
+			name: "API is error",
+			id:   "400000",
+			ok:   false,
+			want: want{response: nil, err: "weather-api-go: can not parse result. unexpected end of JSON input"},
 		},
 	}
 	for _, tt := range tests {
@@ -93,7 +102,12 @@ func TestGetErr(t *testing.T) {
 		client := weather.Client{&http.Client{Transport: localRoundTripper{handler: mux}}}
 		mux.HandleFunc("/api/forecast/city/"+tt.id, func(w http.ResponseWriter, req *http.Request) {
 			res, _ := testData.ReadFile("testdata/" + tt.id + ".json")
-			w.Write(res)
+			if tt.ok {
+				w.Write(res)
+				w.WriteHeader(200)
+			} else {
+				w.WriteHeader(500)
+			}
 		})
 		t.Run(tt.name, func(t *testing.T) {
 			response, err := client.Get(tt.id)
