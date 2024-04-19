@@ -91,7 +91,7 @@ func TestGetErr(t *testing.T) {
 			want: want{response: nil, err: "weather-api-go: can not get normal result. The specified city ID is invalid."},
 		},
 		{
-			name: "API is error",
+			name: "response is invalid",
 			id:   "400000",
 			ok:   false,
 			want: want{response: nil, err: "weather-api-go: can not parse result. unexpected end of JSON input"},
