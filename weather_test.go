@@ -71,29 +71,33 @@ func TestGetErr(t *testing.T) {
 		response *weather.NormalResponse
 		err      string
 	}
+	type Mock struct {
+		statusCode int
+		body       bool
+	}
 
 	tests := []struct {
 		name string
 		id   string
-		ok   bool
+		mock Mock
 		want want
 	}{
 		{
 			name: "id is invalid",
 			id:   "1",
-			ok:   true,
+			mock: Mock{statusCode: http.StatusOK, body: true},
 			want: want{response: nil, err: "weather-api-go: CITY ID is invalid."},
-		},
-		{
-			name: "not found",
-			id:   "400000",
-			ok:   true,
-			want: want{response: nil, err: "weather-api-go: can not get normal result. The specified city ID is invalid."},
 		},
 		{
 			name: "response is invalid",
 			id:   "400000",
-			ok:   false,
+			mock: Mock{statusCode: http.StatusInternalServerError, body: false},
+			want: want{response: nil, err: "weather-api-go: request is failed. <nil>"},
+		},
+		{
+			name: "not found",
+			id:   "400000",
+			mock: Mock{statusCode: http.StatusOK, body: false},
 			want: want{response: nil, err: "weather-api-go: can not parse result. unexpected end of JSON input"},
 		},
 	}
@@ -102,11 +106,11 @@ func TestGetErr(t *testing.T) {
 		client := weather.Client{&http.Client{Transport: localRoundTripper{handler: mux}}}
 		mux.HandleFunc("/api/forecast/city/"+tt.id, func(w http.ResponseWriter, req *http.Request) {
 			res, _ := testData.ReadFile("testdata/" + tt.id + ".json")
-			if tt.ok {
+			w.WriteHeader(tt.mock.statusCode)
+			if tt.mock.body {
 				w.Write(res)
-				w.WriteHeader(200)
 			} else {
-				w.WriteHeader(500)
+				w.Write(nil)
 			}
 		})
 		t.Run(tt.name, func(t *testing.T) {

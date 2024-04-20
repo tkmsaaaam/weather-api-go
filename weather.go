@@ -121,9 +121,10 @@ func (client Client) Get(city string) (*NormalResponse, error) {
 		return nil, fmt.Errorf("weather-api-go: can not make request. %w", requestErr)
 	}
 	resp, err := client.Do(req)
-	if err != nil {
+	if err != nil || resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("weather-api-go: request is failed. %v", err)
 	}
+	defer resp.Body.Close()
 
 	body, readErr := io.ReadAll(resp.Body)
 	if readErr != nil {
